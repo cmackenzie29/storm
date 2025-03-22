@@ -1,61 +1,131 @@
-import pandas as pd
-import numpy as np
-import os
-import matplotlib.pyplot as plt
-from sklearn.cluster import DBSCAN
-from scipy.spatial import ConvexHull
+import sys
+import random
+from storm_analysis import *
 
-condition_prefix = "135 control"
-folder = "/Users/cameron/Downloads/4.22.24"
+def binary_input(message, input1, input2):
+    while True:
+        user_input = input(message)
+        if (user_input == input1) or (user_input == input2):
+            return user_input
 
-all_molec_counts = np.zeros((0,3))
-all_densities = np.zeros((0,3))
-all_intensities = np.zeros((0,3))
+def float_input(message):
+    while True:
+        user_input = input(message)
+        try:
+            user_input = float(user_input)
+            if user_input <= 0:
+                continue
+            return user_input
+        except:
+            continue
 
-for file in os.listdir(folder):
-    dir = os.path.join(folder, file)
-    if os.path.isfile(dir) and (condition_prefix in file):
-        print(file)
-        with open(dir, 'rb') as f:
-            contents = f.read()
+def get_user_inputs():
+    os.system("clear")
 
-        rows = str(contents,'utf-16').split('\r\n')[1:]
-        storm_data = pd.DataFrame(data = [row.split('\t') for row in rows[1:(len(rows)-1)]], columns=rows[0].split('\t'))
+    while True:
+        folder = input("Enter name of folder or path to directory containing .txt files: ")
+        os.system("clear")
+        if os.path.isdir(folder):
+            break
+        else:
+            print(f"Could not find \"{folder}\". Current directory: \"{os.getcwd()}\"\n")
 
-        # Extract important parameters from dataframe
-        positions = np.array(storm_data.iloc[:,1:4]).astype(float)
-        storm_colors = np.array(storm_data.Color).astype(int)
-        intensity = np.array(storm_data.Intensity).astype(float)
+    files = [x for x in os.listdir(folder) if ".txt" in x]
+    if len(files) < 1:
+        print("No .txt files found. Try again with a different directory containing .txt files.")
+        sys.exit()
 
-        ## DBSCAN
-        clustering = DBSCAN(eps=0.1, min_samples=30, n_jobs=-1).fit(positions)
-        total_clusters = max(clustering.labels_)+1
+    while True:
+        print(f"Files in \"{folder}\":\n" + "\n".join(files) + "\n")
+        condition_prefix = input(f"Enter a prefix unique to the files for a single condition: ")
+        os.system("clear")
 
-        ## Calculations
-        molecs = np.zeros((total_clusters,3))
-        densities = np.zeros((total_clusters,3))
-        intensities = np.zeros((total_clusters,3))
-        for clust in range(total_clusters):
-            for (i, color) in enumerate([255, 65280, 16711935]):
-                cluster = positions[(clustering.labels_==clust) & (storm_colors==color)]
-                if len(cluster) >= 10: # Need at least 10 molecules in all three colors to count as a synapse for the analysis
-                    if np.sum(cluster[:,2]==cluster[0,2])==len(cluster): #Cluster is all in one z-plane (only two dimensional)
-                        densities[clust,i] = len(cluster)/ConvexHull(cluster[:,:2]).volume # Only in XY plane
-                    else:
-                        densities[clust,i] = len(cluster)/ConvexHull(cluster).volume
-                    molecs[clust,i] = len(cluster)
-                    intensities[clust,i] = np.sum(intensity[(clustering.labels_==clust) & (storm_colors==color)])
+        selected_files = [x for x in files if x[:len(condition_prefix)]==condition_prefix]
+        if len(selected_files) > 0:
+            print(f"Files in \"{folder}\" with prefix \"{condition_prefix}\":\n" + "\n".join(selected_files) + "\n")
+            confirmation = binary_input("Proceed with analyzing these files together (type y) or enter a new condition prefix (type n)? ", "y", "n")
+            if confirmation == "y":
+                break
+        else:
+            confirmation = binary_input(f"No files in \"{folder}\" found matching prefix \"{condition_prefix}\". Enter a different condition prefix (type y) or quit (type q)? ", "y", "q")
+            os.system("clear")
+            if confirmation == "q":
+                sys.exit()
 
-        included = (np.sum(molecs==0,axis=1)==0) # Array of indices where all three colors had enough molecules
+    os.system("clear")
 
-        all_molec_counts = np.append(all_molec_counts,molecs[included],axis=0)
-        all_densities = np.append(all_densities,densities[included],axis=0)
-        all_intensities = np.append(all_intensities,intensities[included],axis=0)
+    dim = binary_input("Is this data 2D STORM or 3D STORM (type 2/3): ", "2", "3")
 
-print(f"Total synapses: {len(all_molec_counts)}")
-print(f"Mean±SEM of molecule counts: {np.mean(all_molec_counts,axis=0)}±{np.std(all_molec_counts,axis=0)/np.sqrt(len(all_molec_counts))}")
-print(f"Mean±SEM of cluster densities (#/µm2): {np.mean(all_densities,axis=0)}±{np.std(all_densities,axis=0)/np.sqrt(len(all_densities))}")
-print(f"Mean±SEM of cluster intensities: {np.mean(all_intensities,axis=0)}±{np.std(all_intensities,axis=0)/np.sqrt(len(all_intensities))}")
-print("(Order is red, green, magenta)")
+    while True:
+        os.system("clear")
+        red_name = input("Enter the name of the molecule tagged by red (or press enter to exclude): ")
+        green_name = input("Enter the name of the molecule tagged by green (or press enter to exclude): ")
+        magenta_name = input("Enter the name of the molecule tagged by magenta/far-red (or press enter to exclude): ")
+        os.system("clear")
+        print("\nRed: " + ("-SKIP-" if red_name=="" else "\""+red_name+"\""))
+        print("Green: " + ("-SKIP-" if green_name=="" else "\""+green_name+"\""))
+        print("Magenta: " + ("-SKIP-" if magenta_name=="" else "\""+magenta_name+"\""))
+        confirmation = binary_input("\nIs this correct (enter y/n): ", "y", "n")
+        if confirmation == "y":
+            break
 
+    colors = {}
+    if red_name != "":
+        colors[255] = red_name
+    if green_name != "":
+        colors[65280] = green_name
+    if magenta_name != "":
+        colors[16711935] = magenta_name
 
+    os.system("clear")
+    print("How would you like your files analyzed?\n")
+    print("Clustering mode looks for clusters of molecules using DBSCAN (recommended).\n")
+    print("Basic mode can provide nearest neighbor distances between molecules if your files do not have clusters or are especially noisy.\n")
+    mode = binary_input("Proceed in clustering mode or basic mode (type c/b): ", "c", "b")
+
+    os.system("clear")
+    output_mode = binary_input("Would you like the raw data for each synapse or summary data with statistics calculated (type r/s): ", "r", "s")
+    os.system("clear")
+
+    if mode == "b":
+        # Basic mode
+        print(f"Analyzing files with prefix \"{condition_prefix}\" in basic mode...\n")
+        analyze_basic(folder, selected_files, dim, colors, output_mode)
+        sys.exit()
+
+    # Clustering mode
+    clustering_mode = binary_input("Do the clusters contain all molecule colors together or just one color (type a/o): ", "a", "o")
+
+    eps = 0.5
+    min_samples = 10
+
+    example_data = load_storm_file(folder, random.choice(selected_files))
+    positions = np.array(example_data.iloc[:,1:4]).astype(float)
+    storm_colors = np.array(example_data.Color).astype(int)
+    # Filter by the user-requested colors
+    positions = positions[np.column_stack([(storm_colors == x) for x in colors.keys()]).any(axis=1), :]
+    storm_colors = storm_colors[np.column_stack([(storm_colors == x) for x in colors.keys()]).any(axis=1)]
+
+    while True:
+        os.system("clear")
+        print(f"DBSCAN parameters: eps = {eps}, min_samples = {min_samples}. Molecules are shown in grey, with clusters shown in colors. Close image to continue...\n")
+        if clustering_mode == "a":
+            display_clusters(positions, eps, min_samples)
+        else:
+            display_clusters(positions, eps, min_samples, storm_colors)
+        confirmation = binary_input("Does the clustering look good (type y/n): ", "y", "n")
+        if confirmation == "y":
+            break
+        else:
+            print("\nEnter new DBSCAN parameters to try: ")
+            eps = float_input("eps = ")
+            min_samples = round(float_input("min_samples = "))
+
+    os.system("clear")
+    print(f"Analyzing files with DBSCAN parameters: eps = {eps}, min_samples = {min_samples}...")
+    if clustering_mode == "a":
+        analyze_clustering_colors_together(folder, files, dim, colors, eps, min_samples, output_mode)
+    else:
+        analyze_clustering_colors_individual(folder, files, dim, colors, eps, min_samples, output_mode)
+
+get_user_inputs()
