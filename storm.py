@@ -52,9 +52,13 @@ def get_user_inputs():
             if confirmation == "q":
                 sys.exit()
 
+    # Create results folder if it does not exist
+    if not os.path.isdir(os.path.join(folder, "results")):
+        os.mkdir(os.path.join(folder, "results"))
+    
     os.system("clear")
 
-    dim = binary_input("Is this data 2D STORM or 3D STORM (type 2/3): ", "2", "3")
+    dim = int(binary_input("Is this data 2D STORM or 3D STORM (type 2/3): ", "2", "3"))
 
     while True:
         os.system("clear")
@@ -79,18 +83,18 @@ def get_user_inputs():
 
     os.system("clear")
     print("How would you like your files analyzed?\n")
-    print("Clustering mode looks for clusters of molecules using DBSCAN (recommended).\n")
-    print("Basic mode can provide nearest neighbor distances between molecules if your files do not have clusters or are especially noisy.\n")
+    print("Clustering mode looks for clusters of molecules using DBSCAN and provides a more thorough analysis.\n")
+    print("Basic mode provides nearest neighbor distances between molecules, regardless of if your files have clusters.\n")
     mode = binary_input("Proceed in clustering mode or basic mode (type c/b): ", "c", "b")
 
     os.system("clear")
-    output_mode = binary_input("Would you like the raw data for each synapse or summary data with statistics calculated (type r/s): ", "r", "s")
+    output_mode = binary_input("Would you like to output only summary statistics or raw data entries as well (type s/r): ", "s", "r")
     os.system("clear")
 
     if mode == "b":
         # Basic mode
         print(f"Analyzing files with prefix \"{condition_prefix}\" in basic mode...\n")
-        analyze_basic(folder, selected_files, dim, colors, output_mode)
+        analyze_basic(folder, selected_files, condition_prefix, colors, output_mode)
         sys.exit()
 
     # Clustering mode
@@ -99,12 +103,7 @@ def get_user_inputs():
     eps = 0.5
     min_samples = 10
 
-    example_data = load_storm_file(folder, random.choice(selected_files))
-    positions = np.array(example_data.iloc[:,1:4]).astype(float)
-    storm_colors = np.array(example_data.Color).astype(int)
-    # Filter by the user-requested colors
-    positions = positions[np.column_stack([(storm_colors == x) for x in colors.keys()]).any(axis=1), :]
-    storm_colors = storm_colors[np.column_stack([(storm_colors == x) for x in colors.keys()]).any(axis=1)]
+    positions, storm_colors, _ = load_storm_file(folder, random.choice(selected_files), colors)
 
     while True:
         os.system("clear")
@@ -124,8 +123,8 @@ def get_user_inputs():
     os.system("clear")
     print(f"Analyzing files with DBSCAN parameters: eps = {eps}, min_samples = {min_samples}...")
     if clustering_mode == "a":
-        analyze_clustering_colors_together(folder, files, dim, colors, eps, min_samples, output_mode)
+        analyze_clustering_colors_together(folder, files, condition_prefix, dim, colors, eps, min_samples, output_mode)
     else:
-        analyze_clustering_colors_individual(folder, files, dim, colors, eps, min_samples, output_mode)
+        analyze_clustering_colors_individual(folder, files, condition_prefix, dim, colors, eps, min_samples, output_mode)
 
 get_user_inputs()
