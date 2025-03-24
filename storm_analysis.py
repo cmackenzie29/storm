@@ -155,7 +155,7 @@ def analyze_clustering_colors_together(folder, files, condition_prefix, dim, col
                     intens[c] = np.append(intens[c], np.sum(ints_clust[cols_clust==c]))
 
         # Finish plotting for file
-        plt.savefig(os.path.join(folder, f"results/{".".join(file.split(".")[:-1])}_clustering.png"))
+        plt.savefig(os.path.join(folder, f"results/{'.'.join(file.split('.')[:-1])}_clustering.png"))
 
     # Summary statistics for NNs
     output_text = ""
@@ -288,7 +288,7 @@ def analyze_clustering_colors_individual(folder, files, condition_prefix, dim, c
                 intens[c] = np.append(intens[c], np.sum(ints_clust))
 
         # Finish plotting for file
-        plt.savefig(os.path.join(folder, f"results/{".".join(file.split(".")[:-1])}_clustering_single_color.png"))
+        plt.savefig(os.path.join(folder, f"results/{'.'.join(file.split('.')[:-1])}_clustering_single_color.png"))
 
     # Summary statistics for NNs
     output_text = ""
