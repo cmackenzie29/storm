@@ -123,8 +123,8 @@ def get_user_inputs():
     os.system("clear")
     print(f"Analyzing files with DBSCAN parameters: eps = {eps}, min_samples = {min_samples}...")
     if clustering_mode == "a":
-        analyze_clustering_colors_together(folder, files, condition_prefix, dim, colors, eps, min_samples, output_mode)
+        analyze_clustering_colors_together(folder, selected_files, condition_prefix, dim, colors, eps, min_samples, output_mode)
     else:
-        analyze_clustering_colors_individual(folder, files, condition_prefix, dim, colors, eps, min_samples, output_mode)
+        analyze_clustering_colors_individual(folder, selected_files, condition_prefix, dim, colors, eps, min_samples, output_mode)
 
 get_user_inputs()
