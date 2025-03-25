@@ -8,12 +8,14 @@ def binary_input(message, input1, input2):
         if (user_input == input1) or (user_input == input2):
             return user_input
 
-def float_input(message):
+def float_input(message, allow_zero=False):
     while True:
         user_input = input(message)
         try:
             user_input = float(user_input)
-            if user_input <= 0:
+            if user_input < 0:
+                continue
+            elif (user_input == 0) and (not allow_zero):
                 continue
             return user_input
         except:
@@ -60,26 +62,42 @@ def get_user_inputs():
 
     dim = int(binary_input("Is this data 2D STORM or 3D STORM (type 2/3): ", "2", "3"))
 
-    while True:
-        os.system("clear")
-        red_name = input("Enter the name of the molecule tagged by red (or press enter to exclude): ")
-        green_name = input("Enter the name of the molecule tagged by green (or press enter to exclude): ")
-        magenta_name = input("Enter the name of the molecule tagged by magenta/far-red (or press enter to exclude): ")
-        os.system("clear")
-        print("\nRed: " + ("-SKIP-" if red_name=="" else "\""+red_name+"\""))
-        print("Green: " + ("-SKIP-" if green_name=="" else "\""+green_name+"\""))
-        print("Magenta: " + ("-SKIP-" if magenta_name=="" else "\""+magenta_name+"\""))
-        confirmation = binary_input("\nIs this correct (enter y/n): ", "y", "n")
-        if confirmation == "y":
-            break
+    os.system("clear")
+    color_scheme = binary_input("Would you like to use default molecule colors or enter them manually (type d/m): ", "d", "m")
 
-    colors = {}
-    if red_name != "":
-        colors[255] = red_name
-    if green_name != "":
-        colors[65280] = green_name
-    if magenta_name != "":
-        colors[16711935] = magenta_name
+    if color_scheme == "m":
+        colors = {}
+        while True:
+            os.system("clear")
+            print("Enter # corresponding to a color in your txt files (e.g. 255 is the default for red) and name of the molecule\n")
+            c_in = round(float_input("Color number: ", allow_zero=True))
+            c_molec = input(f"Enter the name of the molecule tagged by {c_in}: ")
+            colors[c_in] = c_molec
+            print(f"\nAdded {c_in}: {c_molec}")
+            confirmation = binary_input("Add another color (type y/n): ", "y", "n")
+            if confirmation == "n":
+                break
+    else: # Default colors
+        while True:
+            os.system("clear")
+            red_name = input("Enter the name of the molecule tagged by red (or press enter to exclude): ")
+            green_name = input("Enter the name of the molecule tagged by green (or press enter to exclude): ")
+            magenta_name = input("Enter the name of the molecule tagged by magenta/far-red (or press enter to exclude): ")
+            os.system("clear")
+            print("\nRed: " + ("-SKIP-" if red_name=="" else "\""+red_name+"\""))
+            print("Green: " + ("-SKIP-" if green_name=="" else "\""+green_name+"\""))
+            print("Magenta: " + ("-SKIP-" if magenta_name=="" else "\""+magenta_name+"\""))
+            confirmation = binary_input("\nIs this correct (enter y/n): ", "y", "n")
+            if confirmation == "y":
+                break
+
+        colors = {}
+        if red_name != "":
+            colors[255] = red_name
+        if green_name != "":
+            colors[65280] = green_name
+        if magenta_name != "":
+            colors[16711935] = magenta_name
 
     os.system("clear")
     print("How would you like your files analyzed?\n")
