@@ -1,7 +1,5 @@
 # STORM Analysis
 
-![Example Image](example_image.png)
-
 The best way to run the analysis is on your local machine. On Mac:
 - First time only:
 	- Make sure python is installed by typing `python` or `python3` in terminal.
@@ -35,3 +33,5 @@ Alternatively, you can run the analysis from Google Colab with your STORM files 
 - **png files** (clusters) showing the identified clusters for each image given the chosen DBSCAN parameters
 
 Note: distance units are μm
+
+![Example Image](example_image.png)
