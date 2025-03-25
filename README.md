@@ -1,8 +1,10 @@
 # STORM Analysis
 
+![Example Image](example_image.png)
+
 The best way to run the analysis is on your local machine. On Mac:
-- Make sure python is installed by typing `python` or `python3` in terminal.
 - First time only:
+	- Make sure python is installed by typing `python` or `python3` in terminal.
 	- Install necessary packages:
 		- `pip install numpy`
 		- `pip install pandas`
@@ -12,8 +14,9 @@ The best way to run the analysis is on your local machine. On Mac:
 		- `pip install tqdm`
 	- Navigate to the folder you would like to run the analysis from using the `cd` command (e.g. `cd Desktop`)
 	- Clone the repository: `git clone https://github.com/cmackenzie29/storm.git`
-- Navigate to the `storm` folder (e.g. `cd storm`, `cd Desktop/storm`, etc.)
-- Run the program by typing `python storm.py` or `python3 storm.py`
+- To run the analysis:
+	- Navigate to the `storm` folder (e.g. `cd storm`, `cd Desktop/storm`, etc.)
+	- Run the program by typing `python storm.py` or `python3 storm.py`
 
 Alternatively, you can run the analysis from Google Colab with your STORM files stored in Google Drive.
 
