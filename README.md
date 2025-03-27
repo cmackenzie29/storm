@@ -15,6 +15,8 @@ The best way to run the analysis is on your local machine. On Mac:
 - To run the analysis:
 	- Navigate to the `storm` folder (e.g. `cd storm`, `cd Desktop/storm`, etc.)
 	- Run the program by typing `python storm.py` or `python3 storm.py`
+ - If you do not know the colors present in your txt files:
+	- Check by running `python find_colors.py` or `python3 find_colors.py`
 
 Alternatively, you can run the analysis from Google Colab with your STORM files stored in Google Drive.
 
