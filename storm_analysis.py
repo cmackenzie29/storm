@@ -143,16 +143,19 @@ def analyze_clustering_colors_together(folder, files, condition_prefix, dim, col
             if (len(col_cts) == len(colors)) and (col_cts >= dim+2).all(): 
                 plt.scatter(pos_clust[:,0], pos_clust[:,1], s=0.5) # Plot cluster
                 for c in colors.keys():
-                    if dim == 2: # 2D STORM
-                        vol = ConvexHull(pos_clust[cols_clust==c, :2]).volume # Only XY plane
-                    else: # 3D STORM
-                        vol = ConvexHull(pos_clust[cols_clust==c, :]).volume
-                    molecs = np.sum(cols_clust==c)
+                    try:
+                        if dim == 2: # 2D STORM
+                            vol = ConvexHull(pos_clust[cols_clust==c, :2]).volume # Only XY plane
+                        else: # 3D STORM
+                            vol = ConvexHull(pos_clust[cols_clust==c, :]).volume
+                        molecs = np.sum(cols_clust==c)
 
-                    molec_counts[c] = np.append(molec_counts[c], molecs)
-                    densities[c] = np.append(densities[c], molecs / vol)
-                    volumes[c] = np.append(volumes[c], vol)
-                    intens[c] = np.append(intens[c], np.sum(ints_clust[cols_clust==c]))
+                        molec_counts[c] = np.append(molec_counts[c], molecs)
+                        densities[c] = np.append(densities[c], molecs / vol)
+                        volumes[c] = np.append(volumes[c], vol)
+                        intens[c] = np.append(intens[c], np.sum(ints_clust[cols_clust==c]))
+                    except QhullError:
+                        continue # Skip instances where all points are colinear/coplanar
 
         # Finish plotting for file
         plt.savefig(os.path.join(folder, f"results/{'.'.join(file.split('.')[:-1])}_clustering.png"))
