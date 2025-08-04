@@ -2,16 +2,10 @@
 
 The best way to run the analysis is on your local machine. On Mac:
 - First time only:
-	- Make sure python is installed by typing `python` or `python3` in terminal.
-	- Install necessary packages:
-		- `pip install numpy`
-		- `pip install pandas`
-		- `pip install matplotlib`
-		- `pip install scikit-learn`
-		- `pip install scipy`
-		- `pip install tqdm`
+	- Make sure python is installed by typing `python --version` or `python3 --version` in terminal.
 	- Navigate to the folder you would like to run the analysis from using the `cd` command (e.g. `cd Desktop`)
 	- Clone the repository: `git clone https://github.com/cmackenzie29/storm.git`
+	- Install necessary packages: `pip install -r requirements.txt`
 - To run the analysis:
 	- Navigate to the `storm` folder (e.g. `cd storm`, `cd Desktop/storm`, etc.)
 	- Run the program by typing `python storm.py` or `python3 storm.py`
