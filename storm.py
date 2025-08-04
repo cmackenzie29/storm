@@ -1,5 +1,6 @@
 import sys
 import random
+import argparse
 from storm_analysis import *
 
 def binary_input(message, input1, input2):
@@ -118,25 +119,34 @@ def get_user_inputs():
     # Clustering mode
     clustering_mode = binary_input("Do the clusters contain all molecule colors together or just one color (type a/o): ", "a", "o")
 
-    eps = 0.5
-    min_samples = 10
+    ## Check for DBSCAN parameter command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--eps", help="DBSCAN epsilon")
+    parser.add_argument("--min_samples", help="DBSCAN min_samples")
+    args = parser.parse_args()
+    eps = 0.5 if args.eps == None else float(args.eps)
+    min_samples = 10 if args.min_samples == None else int(args.min_samples)
 
     positions, storm_colors, _ = load_storm_file(folder, random.choice(selected_files), colors)
 
-    while True:
-        os.system("clear")
-        print(f"DBSCAN parameters: eps = {eps}, min_samples = {min_samples}. Molecules are shown in grey, with clusters shown in colors. Close image to continue...\n")
-        if clustering_mode == "a":
-            display_clusters(positions, eps, min_samples)
-        else:
-            display_clusters(positions, eps, min_samples, storm_colors)
-        confirmation = binary_input("Does the clustering look good (type y/n): ", "y", "n")
-        if confirmation == "y":
-            break
-        else:
-            print("\nEnter new DBSCAN parameters to try: ")
-            eps = float_input("eps = ")
-            min_samples = round(float_input("min_samples = "))
+    os.system("clear")
+    dbscan_prev = binary_input(f"DBSCAN parameters: eps = {eps}, min_samples = {min_samples}. Would you like to see a preview of the clustering results (type y/n): ", "y", "n")
+
+    if dbscan_prev == "y":
+        while True:
+            os.system("clear")
+            print(f"DBSCAN parameters: eps = {eps}, min_samples = {min_samples}. Molecules are shown in grey, with clusters shown in colors. Close image to continue...\n")
+            if clustering_mode == "a":
+                display_clusters(positions, eps, min_samples)
+            else:
+                display_clusters(positions, eps, min_samples, storm_colors)
+            confirmation = binary_input("Does the clustering look good (type y/n): ", "y", "n")
+            if confirmation == "y":
+                break
+            else:
+                print("\nEnter new DBSCAN parameters to try: ")
+                eps = float_input("eps = ")
+                min_samples = round(float_input("min_samples = "))
 
     os.system("clear")
     print(f"Analyzing files with DBSCAN parameters: eps = {eps}, min_samples = {min_samples}...")

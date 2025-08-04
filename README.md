@@ -9,8 +9,8 @@ The best way to run the analysis is on your local machine. On Mac:
 - To run the analysis:
 	- Navigate to the `storm` folder (e.g. `cd storm`, `cd Desktop/storm`, etc.)
 	- Run the program by typing `python storm.py` or `python3 storm.py`
- - If you do not know the colors present in your txt files:
-	- Check by running `python find_colors.py` or `python3 find_colors.py`
+		- The program will allow you to interactively select DBSCAN parameters that work for your data. Optionally, if you already know the DBSCAN parameters you would like to use, you can specify them as command-line arguments like `python storm.py --eps=0.5 --min_samples=10`
+ - If you do not know the colors present in your txt files, check by running `python find_colors.py`
 
 Alternatively, you can run the analysis from Google Colab with your STORM files stored in Google Drive.
 
