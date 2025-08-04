@@ -280,16 +280,19 @@ def analyze_clustering_colors_individual(folder, files, condition_prefix, dim, c
                 c = c[0]
                 plt.scatter(pos_clust[:,0], pos_clust[:,1], s=0.5) # Plot cluster
                 
-                if dim == 2: # 2D STORM
-                    vol = ConvexHull(pos_clust[:, :2]).volume # Only XY plane
-                else: # 3D STORM
-                    vol = ConvexHull(pos_clust).volume
-                molecs = len(pos_clust)
+                try:
+                    if dim == 2: # 2D STORM
+                        vol = ConvexHull(pos_clust[:, :2]).volume # Only XY plane
+                    else: # 3D STORM
+                        vol = ConvexHull(pos_clust).volume
+                    molecs = len(pos_clust)
 
-                molec_counts[c] = np.append(molec_counts[c], molecs)
-                densities[c] = np.append(densities[c], molecs / vol)
-                volumes[c] = np.append(volumes[c], vol)
-                intens[c] = np.append(intens[c], np.sum(ints_clust))
+                    molec_counts[c] = np.append(molec_counts[c], molecs)
+                    densities[c] = np.append(densities[c], molecs / vol)
+                    volumes[c] = np.append(volumes[c], vol)
+                    intens[c] = np.append(intens[c], np.sum(ints_clust))
+                except QhullError:
+                    continue # Skip instances where all points are colinear/coplanar
 
         # Finish plotting for file
         plt.savefig(os.path.join(folder, f"results/{'.'.join(file.split('.')[:-1])}_clustering_single_color.png"))
