@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 from scipy.spatial import ConvexHull
+from scipy.spatial._qhull import QhullError
 from sklearn.neighbors import NearestNeighbors, KDTree
 
 def load_storm_file(folder, f, colors):
